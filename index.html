@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Headroom Land — Substation-led site origination, South of England</title>
+<meta name="description" content="Off-market BESS site sourcing across the SSEN and UKPN areas. Grid headroom analysis, parcel filtering, direct landowner contact.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAFBF9;
+    --grid-line:#E3E8E2;
+    --ink:#15222E;
+    --navy:#1D3A5F;
+    --amber:#F2A900;
+    --amber-deep:#C98C00;
+    --muted:#5C6B77;
+    --hairline:#CBD4CD;
+    --display:'IBM Plex Sans Condensed',sans-serif;
+    --body:'IBM Plex Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--body);
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.6;font-size:16px;
+    overflow-x:hidden;
+  }
+  /* animated engineering-grid backdrop */
+  .bg-grid{
+    position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:48px 48px;
+  }
+  .bg-scan{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:linear-gradient(180deg, transparent 0%, rgba(242,169,0,.05) 48%, rgba(242,169,0,.10) 50%, rgba(242,169,0,.05) 52%, transparent 100%);
+    background-size:100% 240px;background-repeat:no-repeat;
+    background-position:0 -240px;
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .bg-scan{animation:scan 9s linear infinite}
+    @keyframes scan{from{background-position:0 -240px}to{background-position:0 calc(100vh + 240px)}}
+  }
+  a{color:var(--navy)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+  /* ---------- top bar ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    border-bottom:2px solid var(--ink);
+    background:rgba(250,251,249,.86);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+  .brand-mark{width:34px;height:34px;flex:0 0 34px}
+  @media (prefers-reduced-motion:no-preference){
+    .brand-mark .spin{transform-origin:17px 17px;animation:rotor 14s linear infinite}
+    @keyframes rotor{to{transform:rotate(360deg)}}
+  }
+  .brand-name{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:.01em}
+  .brand-name span{color:var(--amber-deep)}
+  .top-tag{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;text-align:right}
+  @media(max-width:560px){.top-tag{display:none}}
+
+  /* ---------- ticker strip ---------- */
+  .ticker{
+    border-bottom:1px solid var(--hairline);
+    background:var(--ink);color:#8FA0B1;
+    overflow:hidden;white-space:nowrap;
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
+  }
+  .ticker-track{display:inline-block;padding:9px 0}
+  .ticker b{color:var(--amber);font-weight:500}
+  .ticker span{margin:0 26px}
+  @media (prefers-reduced-motion:no-preference){
+    .ticker-track{animation:ticker 32s linear infinite}
+    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  }
+
+  /* ---------- hero ---------- */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;padding:76px 0 64px;align-items:center}
+  @media(max-width:860px){.hero{grid-template-columns:1fr;padding:48px 0 40px}}
+  .eyebrow{
+    font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--amber-deep);margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";display:inline-block;width:28px;height:2px;background:var(--amber)}
+  .eyebrow .live{
+    display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:var(--amber);box-shadow:0 0 0 0 rgba(242,169,0,.5);
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .eyebrow .live{animation:beacon 2s ease-out infinite}
+    @keyframes beacon{0%{box-shadow:0 0 0 0 rgba(242,169,0,.55)}100%{box-shadow:0 0 0 12px rgba(242,169,0,0)}}
+  }
+  h1{
+    font-family:var(--display);font-weight:700;
+    font-size:clamp(2.1rem,4.6vw,3.3rem);
+    line-height:1.08;letter-spacing:-.01em;margin-bottom:22px;
+  }
+  h1 em{font-style:normal;color:var(--navy);box-shadow:inset 0 -0.28em 0 rgba(242,169,0,.35)}
+  .lede{font-size:1.08rem;color:var(--muted);max-width:46ch;margin-bottom:30px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{
+    font-family:var(--display);font-weight:600;font-size:.95rem;
+    padding:13px 24px;text-decoration:none;letter-spacing:.02em;
+    border:2px solid var(--ink);position:relative;overflow:hidden;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary{background:var(--ink);color:var(--paper)}
+  .btn-secondary{background:transparent;color:var(--ink)}
+  .btn::after{
+    content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent);
+    transform:skewX(-18deg);transition:left .45s ease;
+  }
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--amber)}
+  .btn:hover::after{left:160%}
+  .btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+  /* hero schematic */
+  .schematic{border:2px solid var(--ink);background:#fff;padding:10px;position:relative;box-shadow:8px 8px 0 rgba(21,34,46,.08)}
+  .schematic figcaption{
+    font-family:var(--mono);font-size:.7rem;color:var(--muted);
+    border-top:1px solid var(--hairline);margin-top:8px;padding-top:8px;
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .schematic svg{display:block;width:100%;height:auto}
+  .dash{stroke-dasharray:5 5}
+  @media (prefers-reduced-motion:no-preference){
+    .flow{stroke-dasharray:7 6;animation:flow 1.2s linear infinite}
+    @keyframes flow{to{stroke-dashoffset:-13}}
+    .pulse{animation:pulse 2.6s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.25}50%{opacity:.75}}
+    .radar{transform-origin:150px 160px;animation:radar 7s linear infinite}
+    @keyframes radar{to{transform:rotate(360deg)}}
+    .blink{animation:blink 1.6s steps(2,start) infinite}
+    @keyframes blink{to{visibility:hidden}}
+  }
+
+  /* ---------- scroll reveal ---------- */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease, transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  .reveal:nth-child(2){transition-delay:.1s}
+  .reveal:nth-child(3){transition-delay:.2s}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+  /* ---------- section scaffolding ---------- */
+  section{padding:64px 0;border-top:1px solid var(--hairline)}
+  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:36px;flex-wrap:wrap}
+  .sec-ref{font-family:var(--mono);font-size:.78rem;color:var(--amber-deep);letter-spacing:.08em}
+  h2{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,2.8vw,2rem);letter-spacing:-.005em}
+
+  /* ---------- method ---------- */
+  .method{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--ink);background:#fff}
+  @media(max-width:860px){.method{grid-template-columns:1fr}}
+  .step{padding:28px 26px;border-right:1px solid var(--hairline);position:relative;transition:background .25s ease}
+  .step:hover{background:#FFFDF4}
+  .step::before{
+    content:"";position:absolute;left:0;top:0;height:3px;width:0;background:var(--amber);
+    transition:width .4s ease;
+  }
+  .step:hover::before{width:100%}
+  .step:last-child{border-right:none}
+  @media(max-width:860px){.step{border-right:none;border-bottom:1px solid var(--hairline)}.step:last-child{border-bottom:none}}
+  .step-tag{
+    font-family:var(--mono);font-size:.72rem;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .step-tag b{color:var(--paper);background:var(--navy);font-weight:500;padding:2px 7px}
+  .step h3{font-family:var(--display);font-weight:600;font-size:1.12rem;margin-bottom:10px}
+  .step p{font-size:.93rem;color:var(--muted)}
+  .step p strong{color:var(--ink);font-weight:600}
+
+  /* ---------- spec sheet ---------- */
+  .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  @media(max-width:860px){.spec-grid{grid-template-columns:1fr}}
+  .spec-table{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--ink)}
+  .spec-table caption{
+    text-align:left;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);padding:0 0 10px;caption-side:top;
+  }
+  .spec-table td{padding:13px 16px;border-bottom:1px solid var(--hairline);font-size:.93rem;vertical-align:top}
+  .spec-table tr{transition:background .2s ease}
+  .spec-table tr:hover{background:#FFFDF4}
+  .spec-table tr:last-child td{border-bottom:none}
+  .spec-table td:first-child{font-family:var(--mono);font-size:.8rem;color:var(--muted);white-space:nowrap;width:42%}
+  .spec-table td:last-child{font-weight:600}
+  .spec-note{font-size:.95rem;color:var(--muted);max-width:50ch}
+  .spec-note p+p{margin-top:14px}
+  .spec-note strong{color:var(--ink)}
+
+  /* ---------- audiences ---------- */
+  .aud-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:860px){.aud-grid{grid-template-columns:1fr}}
+  .aud{border:2px solid var(--ink);background:#fff;padding:30px 28px;transition:transform .2s ease, box-shadow .2s ease}
+  .aud:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 rgba(242,169,0,.45)}
+  .aud.accent{background:var(--ink);color:var(--paper)}
+  .aud.accent h3{color:var(--paper)}
+  .aud.accent p{color:#B9C4CE}
+  .aud.accent .aud-tag{color:var(--amber)}
+  .aud-tag{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber-deep);margin-bottom:12px}
+  .aud h3{font-family:var(--display);font-weight:700;font-size:1.3rem;margin-bottom:12px}
+  .aud p{font-size:.95rem;color:var(--muted);margin-bottom:12px}
+  .aud ul{list-style:none;margin-top:6px}
+  .aud li{font-size:.93rem;padding:9px 0 9px 24px;position:relative;border-top:1px dashed var(--hairline)}
+  .aud.accent li{border-top-color:#33455A}
+  .aud li::before{content:"";position:absolute;left:2px;top:16px;width:10px;height:10px;border:2px solid var(--amber)}
+
+  /* ---------- about ---------- */
+  .about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:start}
+  @media(max-width:860px){.about-grid{grid-template-columns:1fr}}
+  .about p{margin-bottom:16px;max-width:58ch}
+  .about p strong{font-weight:600}
+  .cred{border-left:3px solid var(--amber);padding:4px 0 4px 18px;margin-top:24px}
+  .cred dt{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .cred dd{font-weight:600;margin-bottom:12px}
+  .cred dd:last-child{margin-bottom:0}
+
+  /* ---------- contact ---------- */
+  .contact{background:var(--ink);color:var(--paper);border-top:2px solid var(--ink);position:relative;overflow:hidden}
+  .contact::before{
+    content:"";position:absolute;inset:0;opacity:.07;pointer-events:none;
+    background-image:
+      linear-gradient(#8FA0B1 1px, transparent 1px),
+      linear-gradient(90deg, #8FA0B1 1px, transparent 1px);
+    background-size:48px 48px;
+  }
+  .contact .sec-ref{color:var(--amber)}
+  .contact h2{color:var(--paper)}
+  .contact-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start;position:relative}
+  @media(max-width:860px){.contact-grid{grid-template-columns:1fr}}
+  .contact p{color:#B9C4CE;max-width:50ch;margin-bottom:24px}
+  .contact-card{border:1px solid #33455A;padding:26px;font-family:var(--mono);font-size:.9rem;background:rgba(21,34,46,.6)}
+  .contact-card div{padding:10px 0;border-bottom:1px dashed #33455A;display:flex;gap:16px;flex-wrap:wrap}
+  .contact-card div:last-child{border-bottom:none}
+  .contact-card span{color:#7E8FA0;min-width:84px;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;padding-top:3px}
+  .contact-card a{color:var(--amber);text-decoration:none}
+  .contact-card a:hover{text-decoration:underline}
+  .btn-light{border-color:var(--amber);background:var(--amber);color:var(--ink)}
+  .btn-light:hover{box-shadow:4px 4px 0 rgba(255,255,255,.35)}
+
+  footer{background:var(--ink);color:#7E8FA0;font-family:var(--mono);font-size:.72rem;border-top:1px solid #33455A}
+  .foot{display:flex;justify-content:space-between;gap:16px;padding:20px 0;flex-wrap:wrap}
+  .foot a{color:#B9C4CE;text-decoration:none}
+  .foot a:hover{color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-scan" aria-hidden="true"></div>
+
+<header>
+  <div class="wrap topbar">
+    <a class="brand" href="#top" aria-label="Headroom Land — home">
+      <svg class="brand-mark" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="2" y="2" width="30" height="30" fill="none" stroke="#15222E" stroke-width="2.5"/>
+        <circle cx="17" cy="17" r="6.5" fill="none" stroke="#15222E" stroke-width="2.5"/>
+        <g class="spin">
+          <path d="M17 2v8.5M17 23.5V32M2 17h8.5M23.5 17H32" stroke="#F2A900" stroke-width="2.5"/>
+        </g>
+      </svg>
+      <span class="brand-name">Headroom<span> Land</span></span>
+    </a>
+    <div class="top-tag">Substation-led site origination<br>SSEN · UKPN areas</div>
+  </div>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>33kV / 132kV <b>HEADROOM</b></span><span>≤ 1 KM TO SUBSTATION</span><span>2.5 – 10 HA</span><span>FLOOD ZONE 1</span><span>&gt;150 M RESIDENTIAL OFFSET</span><span>FEE ON <b>OPTION SIGNATURE</b></span><span>SSEN · UKPN COVERAGE</span><span>OFF-MARKET ONLY</span><span>33kV / 132kV <b>HEADROOM</b></span><span>≤ 1 KM TO SUBSTATION</span><span>2.5 – 10 HA</span><span>FLOOD ZONE 1</span><span>&gt;150 M RESIDENTIAL OFFSET</span><span>FEE ON <b>OPTION SIGNATURE</b></span><span>SSEN · UKPN COVERAGE</span><span>OFF-MARKET ONLY</span>
+  </div>
+</div>
+
+<main id="top">
+
+  <!-- HERO -->
+  <div class="wrap hero">
+    <div>
+      <p class="eyebrow"><span class="live"></span>BESS land sourcing · South of England</p>
+      <h1>Sites are found at the substation, <em>not the estate agent.</em></h1>
+      <p class="lede">Headroom Land originates off-market battery storage sites by starting where viability starts: grid capacity. DNO headroom data first, parcels second, landowners third.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#developers">For developers</a>
+        <a class="btn btn-secondary" href="#contact">Get in touch</a>
+      </div>
+    </div>
+
+    <figure class="schematic" aria-label="Schematic showing site selection method: substation, one kilometre search radius, candidate parcel">
+      <svg viewBox="0 0 440 330" xmlns="http://www.w3.org/2000/svg" role="img">
+        <!-- search radius -->
+        <circle cx="150" cy="160" r="128" fill="none" stroke="#1D3A5F" stroke-width="1.5" class="dash"/>
+        <circle cx="150" cy="160" r="128" fill="#1D3A5F" opacity="0.04"/>
+        <!-- radar sweep -->
+        <g class="radar">
+          <path d="M150 160 L150 32 A128 128 0 0 1 214 49 Z" fill="#F2A900" opacity="0.10"/>
+        </g>
+        <!-- radius label -->
+        <line x1="150" y1="160" x2="240" y2="69" stroke="#5C6B77" stroke-width="1"/>
+        <text x="206" y="100" font-family="IBM Plex Mono" font-size="11" fill="#5C6B77">≤ 1 km</text>
+        <!-- incoming circuit, energised -->
+        <path d="M14 50 L66 86 L118 118" fill="none" stroke="#15222E" stroke-width="1.5"/>
+        <path d="M14 58 L66 94 L122 128" fill="none" stroke="#C98C00" stroke-width="1.8" class="flow"/>
+        <text x="18" y="40" font-family="IBM Plex Mono" font-size="11" fill="#5C6B77">incoming circuit</text>
+        <!-- substation -->
+        <rect x="128" y="138" width="44" height="44" fill="#FAFBF9" stroke="#15222E" stroke-width="2.5"/>
+        <circle cx="150" cy="160" r="9" fill="none" stroke="#15222E" stroke-width="2.5"/>
+        <circle cx="150" cy="160" r="16" fill="#F2A900" opacity="0.35" class="pulse"/>
+        <text x="150" y="206" font-family="IBM Plex Mono" font-size="11" fill="#15222E" text-anchor="middle">33/132kV substation</text>
+        <text x="150" y="221" font-family="IBM Plex Mono" font-size="11" fill="#5C6B77" text-anchor="middle">headroom confirmed</text>
+        <!-- parcel -->
+        <path d="M236 150 L342 132 L368 206 L296 240 L244 214 Z" fill="#F2A900" opacity="0.18" stroke="#C98C00" stroke-width="2"/>
+        <text x="300" y="183" font-family="IBM Plex Mono" font-size="11" fill="#15222E" text-anchor="middle">candidate parcel</text>
+        <text x="300" y="198" font-family="IBM Plex Mono" font-size="11" fill="#5C6B77" text-anchor="middle">2.5–10 ha</text>
+        <!-- connection route, energised -->
+        <path d="M172 160 C 200 160, 210 168, 240 178" fill="none" stroke="#C98C00" stroke-width="2" class="flow"/>
+        <!-- residential exclusion -->
+        <rect x="330" y="42" width="16" height="14" fill="none" stroke="#5C6B77" stroke-width="1.5"/>
+        <path d="M328 42 L338 32 L348 42" fill="none" stroke="#5C6B77" stroke-width="1.5"/>
+        <line x1="324" y1="60" x2="352" y2="32" stroke="#5C6B77" stroke-width="1.2"/>
+        <text x="338" y="76" font-family="IBM Plex Mono" font-size="11" fill="#5C6B77" text-anchor="middle">&gt;150 m</text>
+        <!-- status cursor -->
+        <text x="14" y="312" font-family="IBM Plex Mono" font-size="11" fill="#C98C00">SCANNING PARCELS<tspan class="blink">_</tspan></text>
+        <!-- north arrow -->
+        <path d="M412 286 L418 266 L424 286 L418 281 Z" fill="#15222E"/>
+        <text x="418" y="302" font-family="IBM Plex Mono" font-size="11" fill="#15222E" text-anchor="middle">N</text>
+      </svg>
+      <figcaption>
+        <span>FIG.01 — SITE SELECTION LOGIC</span>
+        <span>NOT TO SCALE</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- METHOD -->
+  <section id="method">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-ref">SEC.01</span>
+        <h2>Method: grid first, land second</h2>
+      </div>
+      <div class="method">
+        <div class="step reveal">
+          <p class="step-tag"><b>STEP 1</b> DESK</p>
+          <h3>Headroom analysis</h3>
+          <p>DNO capacity maps and NESO queue data identify substations with <strong>genuine available capacity</strong> — filtered against regional Clean Power 2030 allocations, so sites align with where connections will actually be offered.</p>
+        </div>
+        <div class="step reveal">
+          <p class="step-tag"><b>STEP 2</b> DESK</p>
+          <h3>Parcel filtering</h3>
+          <p>Every parcel within range is screened on <strong>size, residential proximity, flood zone, land grade and planning context</strong> — including the local authority's track record on BESS applications.</p>
+        </div>
+        <div class="step reveal">
+          <p class="step-tag"><b>STEP 3</b> FIELD</p>
+          <h3>Landowner approach</h3>
+          <p>Owners are identified through HM Land Registry and contacted directly, by letter. What reaches a developer is a site with <strong>a named owner who is already open to a conversation.</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPEC SHEET -->
+  <section id="criteria">
+    <div class="wrap spec-grid">
+      <div class="reveal">
+        <div class="sec-head">
+          <span class="sec-ref">SEC.02</span>
+          <h2>Screening criteria</h2>
+        </div>
+        <div class="spec-note">
+          <p>These are the defaults every parcel is screened against before it goes anywhere near a developer's inbox. They flex to match each developer's own site specification.</p>
+          <p><strong>Working to your criteria?</strong> Send your site spec and sourcing runs against it directly — capacity range, voltage level, preferred geographies.</p>
+        </div>
+      </div>
+      <table class="spec-table reveal">
+        <caption>TABLE 01 — DEFAULT SITE SPECIFICATION</caption>
+        <tr><td>SUBSTATION DISTANCE</td><td>≤ 1 km, 33kV / 132kV</td></tr>
+        <tr><td>PARCEL SIZE</td><td>2.5 – 10 ha</td></tr>
+        <tr><td>RESIDENTIAL OFFSET</td><td>&gt; 150 m</td></tr>
+        <tr><td>FLOOD ZONE</td><td>Zone 1 preferred</td></tr>
+        <tr><td>LAND GRADE</td><td>Grade 3 or lower</td></tr>
+        <tr><td>DESIGNATIONS</td><td>No SSSI / AONB / Green Belt conflict</td></tr>
+        <tr><td>PLANNING AUTHORITY</td><td>Screened for BESS consent record</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- AUDIENCES -->
+  <section id="developers">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-ref">SEC.03</span>
+        <h2>Who this is for</h2>
+      </div>
+      <div class="aud-grid">
+        <div class="aud accent reveal">
+          <p class="aud-tag">FOR DEVELOPERS</p>
+          <h3>Off-market sites, pre-screened</h3>
+          <p>A steady flow of connectable land, sourced to your specification — without competing for the same agent-marketed sites as everyone else.</p>
+          <ul>
+            <li>Sites matched to your published criteria, not speculative submissions</li>
+            <li>Landowner identified, contacted and open to terms before introduction</li>
+            <li>Simple written introducer agreement, fee tied to option signature</li>
+            <li>Each introduction logged with parcel reference and date</li>
+          </ul>
+        </div>
+        <div class="aud reveal">
+          <p class="aud-tag">FOR LANDOWNERS</p>
+          <h3>Quiet land, working harder</h3>
+          <p>If your land sits near a substation, it may hold value that has nothing to do with farming yields — without losing the whole holding.</p>
+          <ul>
+            <li>Battery storage typically needs only 2–3 acres of a holding</li>
+            <li>Long-term index-linked income across a 25–40 year lease</li>
+            <li>An option fee is payable on signing, before anything is built</li>
+            <li>No obligation — an initial conversation costs nothing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap about-grid">
+      <div class="reveal">
+        <div class="sec-head">
+          <span class="sec-ref">SEC.04</span>
+          <h2>Behind the analysis</h2>
+        </div>
+        <dl class="cred">
+          <dt>Background</dt>
+          <dd>Electronics &amp; Communications Engineer</dd>
+          <dt>Infrastructure experience</dt>
+          <dd>20 years in telecoms networks</dd>
+          <dt>Base</dt>
+          <dd>Southampton — covering SSEN &amp; UKPN areas</dd>
+          <dt>Part of</dt>
+          <dd>Bite &amp; Brand Ltd — UK venture builder</dd>
+        </dl>
+      </div>
+      <div class="about reveal">
+        <p>Headroom Land is run by an infrastructure engineer, not an estate agent. <strong>Twenty years in telecoms networks</strong> means capacity data, connection constraints and site engineering are familiar ground — the same disciplines that decide whether a BESS site is viable.</p>
+        <p>The sourcing model is deliberately narrow: <strong>substation-led, data-first, South of England.</strong> Fewer sites, better filtered, with the landowner conversation already started by the time a developer sees the parcel.</p>
+        <p>Based in Southampton, within a day's reach of the most active BESS region in the UK — from Dorset and Hampshire across to Kent, Essex and East Anglia. Headroom Land operates under <a href="https://www.linkedin.com/company/bite-and-brand-ltd/" rel="noopener">Bite &amp; Brand Ltd</a>, a UK venture builder running technology-led businesses across four sectors.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="wrap contact-grid">
+      <div class="reveal">
+        <div class="sec-head">
+          <span class="sec-ref">SEC.05</span>
+          <h2>Start with your site spec</h2>
+        </div>
+        <p>Developers: send your site criteria and introducer terms. Landowners: if you're within sight of a substation, it's worth a conversation.</p>
+        <a class="btn btn-light" href="mailto:hello@headroomland.co.uk">Email Headroom Land</a>
+      </div>
+      <div class="contact-card reveal">
+        <div><span>Email</span><a href="mailto:hello@headroomland.co.uk">hello@headroomland.co.uk</a></div>
+        <div><span>Phone</span><a href="tel:+447311799407">+44 7311 799407</a></div>
+        <div><span>LinkedIn</span><a href="https://www.linkedin.com/company/bite-and-brand-ltd/" rel="noopener">Bite &amp; Brand Ltd</a></div>
+        <div><span>Coverage</span>South of England · SSEN &amp; UKPN</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 HEADROOM LAND · A <a href="https://www.linkedin.com/company/bite-and-brand-ltd/" rel="noopener">BITE &amp; BRAND LTD</a> VENTURE</span>
+    <span>SUBSTATION-LED SITE ORIGINATION</span>
+  </div>
+</footer>
+
+<script>
+  // scroll-triggered reveals
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target);} });
+  },{threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+
+</body>
+</html>
